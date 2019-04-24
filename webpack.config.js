@@ -10,12 +10,19 @@ module.exports = {
   devServer: {
       inline: true,
       port: 8083,
+      proxy: {
+        '/api': {
+          target: 'https://www.easy-mock.com/mock/5b7bce071f130e5b7fe8cd7d/antd-pro',
+          ws: false,
+          changeOrigin: true
+        }
+      },
       historyApiFallback: true
   },
   module: {
     rules: [
       {
-        test: /\.js?$/,
+        test: /\.(js|jsx)$/,
         exclude: /(node_modules|bower_components)/,
         loader: 'babel-loader'
       },

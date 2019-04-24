@@ -9,7 +9,6 @@ import reverse from 'lodash/reverse'
 import { Menu, Icon } from 'antd'
 import menus from '../../menu.json'
 import { hashHistory } from 'react-router'
-import tail from 'lodash/tail'
 
 export default class AppMenu extends React.Component{
   constructor (props) {

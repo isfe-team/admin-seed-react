@@ -2,7 +2,7 @@ import React from 'react'
 import { Button } from 'antd'
 import clone from 'lodash/clone'
 import PQTable from '../common/PQTable'
-// import { transformColums } from '../common/helpers'
+import './SyncTable.less'
 
 const MOCK_LIST_DATA = {
   message: 1,
@@ -23,13 +23,13 @@ class SyncTable extends React.Component {
       query: { },
       resultData: MOCK_LIST_DATA,
       operations: [
-        { type: 'edit', label: '编辑' },
-        { type: 'delete', label: '删除' }
+        { type: 'edit', label: '编辑', disabled: true },
+        { type: 'delete', label: '删除', danger: true }
       ],
       columns: [
-        { title: '规则编号', dataIndex: 'no', type: "title" },
+        { title: '规则编号', dataIndex: 'no', customRender: "ellipsis-with-tooltip" },
         { title: '描述', dataIndex: 'description' },
-        { title: '操作', dataIndex: 'operation' }
+        { title: '操作', dataIndex: 'operation', customRender: "operation" }
       ]
     }
     this.getTableInfo = this.getTableInfo.bind(this)
@@ -69,19 +69,7 @@ class SyncTable extends React.Component {
   getDataTotalCount (xs) {
     return xs.result.totalCount
   }
-  // transformColums (data) {
-  //   const colums = data.map((x) => {
-  //     if (x.type === 'title') {
-  //       x.render = text => <span title={text}>{text}</span>
-  //       return x
-  //     }
-  //   })
-  //   return colums
-  // }
-  // get newColums () {
-  //   const data = this.transformColums(this.state.columns)
-  //   return data
-  // }
+
   render () {
     const { operations, columns, query } = this.state
     return (
@@ -95,6 +83,7 @@ class SyncTable extends React.Component {
           loadDataApi={this.getTableInfo}
           operations={operations}
           loadDataOnMount={true}
+          withPagination={true}
           transformListData={this.transformListData}
           getDataTotalCount={this.getDataTotalCount}
           columns={columns}

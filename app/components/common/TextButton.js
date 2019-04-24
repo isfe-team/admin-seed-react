@@ -1,23 +1,31 @@
-/*!
- * text button | bqliu
- */
 import React from 'react'
 import './TextButton.less'
 
 export default class TextButton extends React.Component {
   constructor (props) {
     super(props)
+    this.handleClick = this.handleClick.bind(this)
   }
 
   handleClick (evt) {
-    return evt
+    this.props.onButtonClick(this.props, evt)
   }
 
   render () {
-    const { disabled } = this.props
-    const buttonClass = { 'x-text-button': true, disabled: disabled, danger: danger }
+    const { disabled, danger, label, className } = this.props
+    let buttonClass = 'x-text-button'
+    if (className) {
+      buttonClass += ` ${className}`
+    }
+    if (disabled) {
+      buttonClass += ' disabled';
+    }
+    if (danger) {
+      buttonClass += ' danger'
+    }
     return (
-      <button class={buttonClass} disabled={disabled} onClick={this.handleClick}>
+      <button className={buttonClass} disabled={disabled} onClick={this.handleClick}>
+        {label}
       </button>
     )
   }

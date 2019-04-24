@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 var instance = axios.create({
-  baseURL: '',
+  baseURL: 'api',
   timeout: 5000,
   headers: { 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
   withCredentials: true
@@ -22,8 +22,12 @@ instance.interceptors.response.use(function (response) {
   if (!response.data) {
     return Promise.reject('服务异常')
   }
-  return response;
+  return response.data;
 }, function (error) {
   // 对响应错误做点什么
   return Promise.reject(error);
-});
+})
+
+export const axiosPromiseWrapper = (action, url, data) => {
+  return Promise.resolve(instance[action](url, data))
+}
