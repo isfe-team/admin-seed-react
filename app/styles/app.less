@@ -1,0 +1,34 @@
+@import './vars.less';
+
+.app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  .app-header {
+    flex: 0 0 @app-header-height;
+  }
+  .app-content {
+    display: flex;
+    flex: 1 1 auto;
+    .app-menu {
+      flex: 0 0 @app-menu-width;
+      height: 100%;
+    }
+
+    &-main {
+      flex: 1 1 auto;
+      height: 100%;
+      padding: 0 12px 12px;
+      overflow: auto;
+      background: #f0f2f5;
+    }
+
+    .app-page {
+      height: calc(~"100% - 20px");
+      padding: 10px;
+      margin-top: 20px;
+      background: #fff;
+    }
+  }
+}
