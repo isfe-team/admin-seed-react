@@ -7,7 +7,6 @@ import React from 'react'
 import { Form, Input, Button, Icon, notification } from 'antd'
 import './styles/login.less'
 import { getErrorMessage } from './utils/helpers'
-import { hashHistory } from 'react-router';
 
 class Login extends React.Component{
 
@@ -20,7 +19,6 @@ class Login extends React.Component{
     evt.preventDefault()
     new Promise((resolve, reject) => {
       this.props.form.validateFields((err, formData) => {
-        console.log(err, 'err')
         if (!err) {
           return resolve('成功')
         }
@@ -31,7 +29,6 @@ class Login extends React.Component{
       (err) => { notification.error({ message: 'LOGIN ERROR', description: getErrorMessage(err, '未知错误') }) }
     )
   }
-    // hashHistory.push('/')
   render () {
     const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form
 

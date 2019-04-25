@@ -1,9 +1,8 @@
 import React from 'react'
 import { Icon, Modal } from 'antd'
-import { hashHistory, Link } from 'react-router'
+import { hashHistory } from 'react-router'
 import './app-header.less'
-import { withRouter } from 'react-router-dom'
-import logo from '../../images/logo.png'
+const logo = 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg'
 
 export default class AppHeader extends React.Component {
   constructor (props) {
@@ -17,7 +16,7 @@ export default class AppHeader extends React.Component {
       okText: '确认',
       cancelText: '取消',
       onOk () {
-        location.href = './login'
+        hashHistory.push('/login')
       }
     })
   }
@@ -31,7 +30,6 @@ export default class AppHeader extends React.Component {
         <div className='app-header-operations'>
           <span className='app-header-user-info'>Hi, 游客 </span>
           <Icon type='logout' className='app-header-icon' onClick={this.logout} />
-          {/* <Link to="/login" activeStyle={{color: 'red'}}>Two</Link> */}
         </div>
       </div>
     )

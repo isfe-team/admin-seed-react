@@ -3,31 +3,19 @@
  * 可以基于该组件做各种定制（比如 XList），也可单独使用
  * @see http://vue.ant.design/components/table-cn
  * @see https://stackoverflow.com/questions/43702591/how-to-use-template-scope-in-vue-jsx
- *
- * @example
- * <PQTable :query="query" @load-data-api="api" :columns="columns"><Query /></PQTable>
- *
- * props 见下面 props
- *
- * events
- * @emits {loadedData} loadData 完成时触发，返回转换后的列表数据
- * @emits {paginationUpdate} pagination 相关参数变化后触发（size-change 和 current-change），返回当前分页信息
- * @emits {operation} 某个操作点击时触发，返回操作类型和当前 record
- *
+ * 
  * @todo
  * - 增加 TextButton 和 AButton 控制
  */
 
 import React from 'react'
 import assign from 'lodash/assign'
-import clone from 'lodash/clone'
 import cloneDeep from 'lodash/cloneDeep'
-import identity from 'lodash/identity'
 import isFunction from 'lodash/isFunction'
-import { Table, Tooltip, Button } from 'antd'
+import { Table, Tooltip } from 'antd'
 import Pagination from './Pagination'
 import TextButton from './TextButton'
-import { showErrorTip, removeHMS } from '../../utils/helpers'
+import { showErrorTip } from '../../utils/helpers'
 import './PQTable.less'
 
 /* constants，默认的页面大小 */
@@ -36,13 +24,23 @@ const DEFAULT_PAGE_SIZES = [ '10', '20', '50', '100' ]
 export default class PQTable extends React.Component {
   constructor (props) {
    super (props)
-   console.log(props, 'prop')
+   const defaultPageSizes = props.defaultPageSizes ? props.defaultPageSizes : DEFAULT_PAGE_SIZES
+   // 分页的默认数据
+   const pagination = assign({ }, {
+     currentPage: 1,
+     totalRows: 0,
+     pageSize: defaultPageSizes[0],
+     pageSizes: defaultPageSizes
+   }, props.initialPagination)
    this.state = {
-    pagination: { },
+    pagination: pagination,
     loadedInitialData: false,
     listData: [ ]
    }
    this.loadData = this.loadData.bind(this)
+   this.handlePageSizeChange = this.handlePageSizeChange.bind(this)
+   this.handleCurrentChange = this.handleCurrentChange.bind(this)
+   this.emitOperation = this.emitOperation.bind(this)
  }
 
   // 过滤列表的操作项
@@ -57,34 +55,66 @@ export default class PQTable extends React.Component {
   get noCollapsedOperations () {
     return this.props.operations.filter((x) => !x.collapsed)
   }
+  get newColums () {
+    const data = this.transformColums(this.props.columns)
+    return data
+  }
+
+  toBoolean (fnOrBoolean, ...args) {
+    if (isFunction(fnOrBoolean)) {
+      return !!fnOrBoolean.apply(this, args)
+    }
+    return !!fnOrBoolean
+  }
+  transformColums (data) {
+    const OperationsRenderer = (/* createElement injected */context) => {
+      const { record, index } = context
+      const noCollapsedOperations = this.noCollapsedOperations.filter((x) => isFunction(x.exist) ? this.toBoolean(x.exist, record, index) : true)
+      const Buttons = noCollapsedOperations.map((operation, index) => {
+        const disabled = this.toBoolean(operation.disabled)
+        const danger = this.toBoolean(operation.danger)
+        return (
+          <TextButton
+            key={index}
+            className='pq-table-operation-item'
+            disabled={disabled}
+            danger={danger}
+            label={operation.label}
+            onButtonClick={this.emitOperation}
+          ></TextButton>
+        )
+      })
+  
+      return Buttons
+    }
+    const colums = data.map((x) => {
+      switch (x.customRender) {
+        case 'ellipsis-with-tooltip':
+          x.render = text => <Tooltip placement='top' className='pq-table-tooltip' title={text}>{text}</Tooltip>
+          break
+        case 'operation':
+          x.render = (text, record, index) => <OperationsRenderer text={text} record={record} index={index} />
+          break        
+      }
+      return x
+    })
+    return colums
+  }
 
   componentWillMount () {
-    const defaultPageSizes = this.props.defaultPageSizes ? this.props.defaultPageSizes : DEFAULT_PAGE_SIZES
-    // 分页的默认数据
-    const pagination = assign({ }, {
-      currentPage: 1,
-      totalRows: 0,
-      pageSize: defaultPageSizes[0],
-      pageSizes: this.defaultPageSizes
-    }, this.initialPagination)
-    this.setState({ pagination: pagination })
     Promise.resolve(
       this.props.loadDataOnMount ? this.loadData() : null
     ).finally(() => {
-      this.loadedInitialData = true
+      this.setState({ loadedInitialData: true })
     })
   }
 
-  componentDidMount () {
-    this.props.onRef(this)
-  }
-
-  componentWillReceiveProps () {
+  componentWillReceiveProps (nextProps) {
     this.handleQueryChange()
   }
 
   handleQueryChange () {
-    if (!this.loadedInitialData) {
+    if (!this.state.loadedInitialData) {
       return
     }
     if (this.state.pagination.currentPage !== 1) {
@@ -93,7 +123,7 @@ export default class PQTable extends React.Component {
     this.loadData()
   }
   handleChangeTable (pagination, filters, sorter) {
-    return sorter
+    // this.props.onTableChange(pagination, filters, sorter)
   }
 
   // 重置分页数据
@@ -167,71 +197,33 @@ export default class PQTable extends React.Component {
     this.state.pagination.currentPage = currentPage
     this.paginationUpdate()
   }
-
+  onRef (ref) {
+    this.child = ref
+  }
+ 
   render () {
-    const tableClass = {
-      'pq-table-core': true,
-      'table-layout-fixed': this.layoutFixed,
-      'table-single-line-mode': this.singleLineMode,
-      'stick-header': this.stickHeader
+    let tableClass = 'pq-table-core'
+    const { layoutFixed, singleLineMode, stickHeader, className } = this.props
+    if (className) {
+      tableClass += ` ${className}`
+    }
+    if (layoutFixed) {
+      tableClass += ' table-layout-fixed'
+    }
+    if (singleLineMode) {
+      tableClass += ' table-single-line-mode'
+    }
+    if (stickHeader) {
+      tableClass += ' stick-header'
     }
     let TablePagination = null
 
-    function toBoolean (fnOrBoolean, ...args) {
-      if (isFunction(fnOrBoolean)) {
-        return !!fnOrBoolean.apply(this, args)
-      }
-      return !!fnOrBoolean
-    }
-
-    // functional components, createElement is auto injected
-    const OperationsRenderer = (/* createElement injected */context) => {
-      const { record, index } = context
-      const noCollapsedOperations = this.noCollapsedOperations.filter((x) => isFunction(x.exist) ? toBoolean(x.exist, record, index) : true)
-      const Buttons = noCollapsedOperations.map((operation, index) => {
-        const disabled = toBoolean(operation.disabled)
-        const danger = toBoolean(operation.danger)
-        return (
-          <TextButton
-            key={index}
-            className='pq-table-operation-item'
-            disabled={disabled}
-            danger={danger}
-            onClick={this.emitOperation.bind(this, operation, record)}
-          >{operation.label}</TextButton>
-        )
-      })
-
-      if (!this.hasCollapsedOperation || !this.showCollapsedOperation) {
-        return Buttons
-      }
-
-      const Overlay = this.collapsedOperations.filter((operation) => toBoolean(operation.exist))
-        .map((operation) => {
-          const disabled = toBoolean(operation.disabled)
-          return (
-            <Menu.MenuItem key={index} disabled={disabled} onClick={this.emitOperation.bind(this, operation, record)}>
-              {operation.label}
-            </Menu.MenuItem>
-          )
-        })
-
-      const Dropdown = (
-        <Dropdown className='pq-table-operation-item pq-table-operations-more pointer' trigger={['click']}>
-          <span>更多&nbsp;<AIcon type="down" /></span>
-          <Menu>{Overlay}</Menu>
-        </Dropdown>
-      )
-
-      return [Buttons, Dropdown]
-    }
-
     const { pagination } = this.state
-
-    if (this.withPagination && this.loadedInitialData) {
+    if (this.props.withPagination && this.state.loadedInitialData) {
       TablePagination = (
         <Pagination
           onPageSizeChange={this.handlePageSizeChange}
+          onRef={this.onRef}
           onCurrentChange={this.handleCurrentChange}
           currentPage={pagination.currentPage}
           total={pagination.totalRows}
@@ -242,30 +234,17 @@ export default class PQTable extends React.Component {
       )
     }
 
-    // 维护用户自定义的 scopedSlots
-    const scopedSlots = assign({
-      // default is useless
-      default: () => null,
-      component: (text, record, index) => null,
-      // 非 top 情况下，比如 topLeft 会在数据比较少时出现错位
-      'time-without-hms': (text) => <Tooltip placement='top' className='pq-table-tooltip' title={text}>{removeHMS(text)}</Tooltip>,
-      'ellipsis-with-title': (text) => <span title={text}>{text}</span>,
-      'ellipsis-with-tooltip': (text) => <Tooltip placement='top' className='pq-table-tooltip' title={text}>{text}</Tooltip>,
-      'operation': (text, record, index) => <OperationsRenderer text={text} record={record} index={index} />
-    }, this.$scopedSlots)
     return (
       <div className="pq-table">
         <Table
-          class={tableClass}
+          className={tableClass}
           dataSource={this.state.listData}
-          columns={this.props.columns}
+          columns={this.newColums}
           pagination={false}
           rowKey={this.props.rowKey}
           size="middle"
           onChange={this.handleChangeTable}
           scroll={this.props.stickHeader ? { y: 'calc(100% - 46px)' } : { }}
-          // {...{ props: this.$attrs }}
-          scopedSlots={scopedSlots}
         >
         </Table>
         {TablePagination}

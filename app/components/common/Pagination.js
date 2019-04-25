@@ -1,21 +1,3 @@
-/*!
- * 基于 `APagination`，用于分页组件，能和 table 搭配使用，见 PQTable
- * props 见下面 props 注释
-  * @Prop({ type: [ Number, String ], default: 10 }) 
-  // 每页显示个数选择器的选项设置
-  @Prop({ type: Array, default () { return [ '10', '20', '30', '40' ] } }) pageSizes
-  // 总条目数
-  @Prop({ type: Number, default: 0 }) total
-  // 当前页数
-  @Prop({ type: Number, default: 1 }) currentPage
- *
- * events
- * @emits {currentChange} currentPage 改变时会触发，返回当前页
- * @emits {sizeChange} pageSize 改变时会触发，返回当前每页条数
- *
- * @TODOS optimize 最大页数小于当前页数，导致的两次 load（增加验证，但是感觉意义不大）
- */
-
 import React from 'react'
 import { Pagination } from 'antd'
 
@@ -32,6 +14,8 @@ export default class Paginations extends React.Component{
     this.state = {
       selectedPageSize: 10
     }
+    this.onShowSizeChange = this.onShowSizeChange.bind(this)
+    this.handleCurrentChange = this.handleCurrentChange.bind(this)
   }
 
   componentWillMount () {
@@ -39,29 +23,35 @@ export default class Paginations extends React.Component{
   }
 
   handleCurrentChange (currentPage) {
-    return currentPage 
+    this.props.onCurrentChange(currentPage)
   }
   onPageSizeChange (size) {
-    this.selectedPageSize = +size
+    const selectedPageSize = +size
+    this.setState({ selectedPageSize: selectedPageSize })
   }
   onShowSizeChange (current, size) {
-    return size
+    this.props.onPageSizeChange(size)
   }
   componentWillReceiveProps (nextProps) {
     this.onPageSizeChange(nextProps.pageSize)
   }
 
   render () {
+    const { className, currentPage, pageSizes, total } = this.props
+    let paginationClass = ''
+    if (className) {
+      paginationClass += ` ${className}`
+    }
     return (
-      <div style={paginationStyle}>
+      <div style={paginationStyle} className={paginationClass}>
         <Pagination
           style={paginationPagesStyle}
           showQuickJumper
           showSizeChanger
-          current={this.props.currentPage}
+          current={currentPage}
           pageSize={this.state.selectedPageSize}
-          pageSizeOptions={this.state.pageSizes}
-          total={this.state.total}
+          pageSizeOptions={pageSizes}
+          total={total}
           onChange={this.handleCurrentChange}
           onShowSizeChange={this.onShowSizeChange}
         />
