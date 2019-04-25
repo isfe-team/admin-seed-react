@@ -14,9 +14,19 @@
     .app-menu {
       flex: 0 0 @app-menu-width;
       height: 100%;
+      transition: none;
+    }
+
+    .app-menu-collapsed {
+      flex: 0 0 @app-collapsed-width;
+      max-width: @app-collapsed-width;
+      min-width: @app-collapsed-width;
+      width: @app-collapsed-width;
     }
 
     &-main {
+      display: flex;
+      flex-direction: column;
       flex: 1 1 auto;
       height: 100%;
       padding: 0 12px 12px;
@@ -25,7 +35,7 @@
     }
 
     .app-page {
-      min-height: calc(~"100% - 20px");
+      flex: 1 1 auto;
       padding: 10px;
       margin-top: 20px;
       background: #fff;

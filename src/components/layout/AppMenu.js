@@ -95,15 +95,22 @@ export default class AppMenu extends React.Component{
     }
 
     const SubMenus = getSubMenuFragment(this.state.menus)
+    const { collapsed } = this.props
+    const { openKeys, selectedKeys } = this.state
+    let appMenuClass = 'app-menu'
+    if (collapsed) {
+      appMenuClass += ' app-menu-collapsed'
+    }
 
     return (
       <Menu
         key="Menu"
-        className="app-menu"
+        className={appMenuClass}
         mode="inline"
         theme="dark"
-        openKeys={this.state.openKeys}
-        selectedKeys={this.state.selectedKeys}
+        inlineCollapsed={collapsed}
+        openKeys={openKeys}
+        selectedKeys={selectedKeys}
         onClick={this.handleSelect}
         onOpenChange={this.handleMenuOpenChange}
       >

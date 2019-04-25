@@ -19,7 +19,7 @@
     overflow: hidden;
     h1 {
       display: inline-block;
-      margin-left: 6px;
+      margin-left: 26px;
       margin-bottom: 0;
       vertical-align: middle;
       font-size: 16px;
@@ -35,15 +35,24 @@
   }
   &-operations {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     height: @app-header-height;
     flex: 1 1 auto;
     padding: 0 12px;
+
+    &-icon {
+      font-size: 20px;
+      cursor: pointer;
+    }
   }
 
   &-user-info {
     font-size: 16px;
     margin-right: 10px;
+  }
+
+  .collapsed-app-header-logo {
+    flex: 0 0 @app-collapsed-width;
   }
 }

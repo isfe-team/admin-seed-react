@@ -8,6 +8,7 @@ import { Form, Input, Button, Icon, notification } from 'antd'
 import './styles/login.less'
 import { getErrorMessage } from './utils/helpers'
 
+const logo = 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg'
 class Login extends React.Component{
 
   constructor (props) {
@@ -37,7 +38,10 @@ class Login extends React.Component{
     return (
       <div id="login">
         <div className="login-logo-wrapper">
-          <h1 onClick={this.login}>登录</h1>
+          <div className="login-title">
+            <img src={logo} />
+            <h1 onClick={this.login}>Admin-Seed-React</h1>
+          </div>
           <Form onSubmit={this.login} className="login-form">
             <Form.Item
               validateStatus={userNameError ? 'error' : ''}

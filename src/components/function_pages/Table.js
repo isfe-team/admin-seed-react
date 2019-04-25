@@ -1,7 +1,7 @@
 import React from 'react'
 import PQTable from '../common/PQTable'
 import { message } from 'antd'
-import { getTableInfo } from '../../apis/apiList/tableApis'
+import { getTableInfo } from '../../apis/api_list/tableApis'
 
 export default class Table extends React.Component {
 
