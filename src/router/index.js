@@ -1,5 +1,5 @@
 import React from 'react'
-import { Router, Route, IndexRoute, hashHistory, Redirect } from 'react-router'
+import { Router, Route, hashHistory, IndexRedirect } from 'react-router'
 import app from '../app'
 import login from '../login'
 import NotFound from '../components/abnormal_pages/NotFound'
@@ -15,7 +15,7 @@ import EggsplantDetail from '../components/function_pages/EggsplantDetail'
 export default () => (
   <Router history={hashHistory}>
     <Route path="/" exact={true} component={app}>
-      <IndexRoute component={Overview} />
+      <IndexRedirect to="/overview" />
       <Route path="/overview" component={Overview} />
       <Route path="/abnormal-pages/no-auth" component={NoAuth} />
       <Route path="/abnormal-pages/serve-error" component={ServerError} />
@@ -25,7 +25,6 @@ export default () => (
       <Route path="/function-pages/corn" component={Corn} />
       <Route path="/function-pages/eggsplant/use" component={Eggsplant} />
       <Route path="/function-pages/eggsplant/detail" component={EggsplantDetail} />
-      <Redirect from="/" to="/overview"></Redirect> 
     </Route>
     <Route path="/login" component={login} />
   </Router>

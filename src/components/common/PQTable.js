@@ -55,6 +55,7 @@ export default class PQTable extends React.Component {
   get noCollapsedOperations () {
     return this.props.operations.filter((x) => !x.collapsed)
   }
+
   get newColums () {
     const data = this.transformColums(this.props.columns)
     return data
@@ -66,6 +67,11 @@ export default class PQTable extends React.Component {
     }
     return !!fnOrBoolean
   }
+
+  componentDidMount() {
+　　this.props.onRef(this)
+　}
+
   transformColums (data) {
     const OperationsRenderer = (/* createElement injected */context) => {
       const { record, index } = context
@@ -122,6 +128,7 @@ export default class PQTable extends React.Component {
     }
     this.loadData()
   }
+
   handleChangeTable (pagination, filters, sorter) {
     // this.props.onTableChange(pagination, filters, sorter)
   }
@@ -197,6 +204,7 @@ export default class PQTable extends React.Component {
     this.state.pagination.currentPage = currentPage
     this.paginationUpdate()
   }
+
   onRef (ref) {
     this.child = ref
   }

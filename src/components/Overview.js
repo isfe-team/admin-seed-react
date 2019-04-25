@@ -2,11 +2,11 @@ import React from 'react'
 import { Card } from 'antd'
 import './Overview.less'
 
-
 class Overview extends React.Component {
 
   constructor (props) {
     super(props)
+    console.log(props)
   }
   render () {
     return (
