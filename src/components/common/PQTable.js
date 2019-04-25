@@ -68,13 +68,9 @@ export default class PQTable extends React.Component {
     return !!fnOrBoolean
   }
 
-  componentDidMount() {
-　　this.props.onRef(this)
-　}
-
   transformColums (data) {
-    const OperationsRenderer = (/* createElement injected */context) => {
-      const { record, index } = context
+    const OperationsRenderer = (props) => {
+      const { record, index } = props
       const noCollapsedOperations = this.noCollapsedOperations.filter((x) => isFunction(x.exist) ? this.toBoolean(x.exist, record, index) : true)
       const Buttons = noCollapsedOperations.map((operation, index) => {
         const disabled = this.toBoolean(operation.disabled)
@@ -86,7 +82,7 @@ export default class PQTable extends React.Component {
             disabled={disabled}
             danger={danger}
             label={operation.label}
-            onButtonClick={this.emitOperation}
+            onButtonClick={this.emitOperation.bind(this, operation, record)}
           ></TextButton>
         )
       })
@@ -140,6 +136,7 @@ export default class PQTable extends React.Component {
   }
 
   emitOperation (operation, record) {
+    console.log('x', ...arguments)
     // 因为如果是 @click.native 的话，哪怕是 disabled，仍旧会触发
     // 所以在这里再判断一次
     // 也可以不用 AMenu 的形式，但是还要改样式
@@ -205,10 +202,6 @@ export default class PQTable extends React.Component {
     this.paginationUpdate()
   }
 
-  onRef (ref) {
-    this.child = ref
-  }
- 
   render () {
     let tableClass = 'pq-table-core'
     const { layoutFixed, singleLineMode, stickHeader, className } = this.props
@@ -231,7 +224,6 @@ export default class PQTable extends React.Component {
       TablePagination = (
         <Pagination
           onPageSizeChange={this.handlePageSizeChange}
-          onRef={this.onRef}
           onCurrentChange={this.handleCurrentChange}
           currentPage={pagination.currentPage}
           total={pagination.totalRows}

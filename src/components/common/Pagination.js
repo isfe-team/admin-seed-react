@@ -1,5 +1,5 @@
-import React from 'react'
-import { Pagination } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Pagination as AntPagination } from 'antd'
 
 const paginationStyle = {
   display: 'flex',
@@ -8,55 +8,44 @@ const paginationStyle = {
 }
 const paginationPagesStyle = { marginRight: '10px' }
 
-export default class Paginations extends React.Component{
-  constructor(props) {
-    super(props)
-    this.state = {
-      selectedPageSize: 10
+export default function Pagination (props) {
+  const [selectedPageSize, setSelectedPageSize] = useState(10)
+  const [isMount, setIsMount] = useState(false)
+
+  useEffect(() => {
+    if (!isMount) {
+      setIsMount(true)
     }
-    this.onShowSizeChange = this.onShowSizeChange.bind(this)
-    this.handleCurrentChange = this.handleCurrentChange.bind(this)
+    setSelectedPageSize(+props.pageSize)
+  }, [props.pageSize])
+
+  function handleCurrentChange (currentPage) {
+    props.onCurrentChange(currentPage)
   }
 
-  componentWillMount () {
-    this.selectedPageSize = +this.pageSize
+  function onPageSizeChange (size) {
+    setSelectedPageSize(+size)
   }
 
-  handleCurrentChange (currentPage) {
-    this.props.onCurrentChange(currentPage)
-  }
-  onPageSizeChange (size) {
-    const selectedPageSize = +size
-    this.setState({ selectedPageSize: selectedPageSize })
-  }
-  onShowSizeChange (current, size) {
-    this.props.onPageSizeChange(size)
-  }
-  componentWillReceiveProps (nextProps) {
-    this.onPageSizeChange(nextProps.pageSize)
+  function onShowSizeChange (current, size) {
+    props.onPageSizeChange(size)
   }
 
-  render () {
-    const { className, currentPage, pageSizes, total } = this.props
-    let paginationClass = ''
-    if (className) {
-      paginationClass += ` ${className}`
-    }
-    return (
-      <div style={paginationStyle} className={paginationClass}>
-        <Pagination
-          style={paginationPagesStyle}
-          showQuickJumper
-          showSizeChanger
-          current={currentPage}
-          pageSize={this.state.selectedPageSize}
-          pageSizeOptions={pageSizes}
-          total={total}
-          onChange={this.handleCurrentChange}
-          onShowSizeChange={this.onShowSizeChange}
-        />
-      </div>
-    )
-  }
-
+  const { className, currentPage, pageSizes, total } = props
+  const paginationClass = className || ''
+  return (
+    <div style={paginationStyle} className={paginationClass}>
+      <AntPagination
+        style={paginationPagesStyle}
+        showQuickJumper
+        showSizeChanger
+        current={currentPage}
+        pageSize={selectedPageSize}
+        pageSizeOptions={pageSizes}
+        total={total}
+        onChange={handleCurrentChange}
+        onShowSizeChange={onShowSizeChange}
+      />
+    </div>
+  )
 }

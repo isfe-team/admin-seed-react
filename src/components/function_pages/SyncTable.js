@@ -34,7 +34,7 @@ class SyncTable extends React.Component {
     }
     this.getTableInfo = this.getTableInfo.bind(this)
     this.changeTable = this.changeTable.bind(this)
-    this.onRef = this.onRef.bind(this)
+    this.tableRef = React.createRef()
   }
 
   transformListData (xs) {
@@ -42,9 +42,6 @@ class SyncTable extends React.Component {
   }
   getTableInfo () {
     return Promise.resolve(clone(this.state.resultData))
-  }
-  onRef (ref) {
-    this.child = ref
   }
   changeTable () {
     if (this.state.resultData.message === 1) {
@@ -64,7 +61,7 @@ class SyncTable extends React.Component {
     } else {
       this.state.resultData = clone(MOCK_LIST_DATA)
     }
-    this.child.loadData()
+    this.tableRef.current.loadData()
   }
   getDataTotalCount (xs) {
     return xs.result.totalCount
@@ -76,10 +73,9 @@ class SyncTable extends React.Component {
       <div>
         <Button type="primary" onClick={this.changeTable}>切换数据</Button>
         <PQTable
-          ref="table"
           className="resource-management-table"
           rowKey="key"
-          onRef={this.onRef}
+          ref={this.tableRef}
           loadDataApi={this.getTableInfo}
           operations={operations}
           loadDataOnMount={true}

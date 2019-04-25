@@ -41,7 +41,6 @@ export default class Table extends React.Component {
     return (
       <div>
          <PQTable
-          ref="table"
           className="resource-management-table"
           rowKey="key"
           loadDataApi={getTableInfo}
