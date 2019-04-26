@@ -1,33 +1,25 @@
 import React from 'react'
 import './TextButton.less'
 
-export default class TextButton extends React.Component {
-  constructor (props) {
-    super(props)
-    this.handleClick = this.handleClick.bind(this)
+export default function TextButton (props) {
+  function handleClick (evt) {
+    props.onButtonClick(evt)
   }
 
-  handleClick (evt) {
-    this.props.onButtonClick(this.props, evt)
+  const { disabled, danger, label, className } = props
+  const buttonClass = ['x-text-button']
+  if (className) {
+    buttonClass.push(className)
   }
-
-  render () {
-    const { disabled, danger, label, className } = this.props
-    let buttonClass = 'x-text-button'
-    if (className) {
-      buttonClass += ` ${className}`
-    }
-    if (disabled) {
-      buttonClass += ' disabled';
-    }
-    if (danger) {
-      buttonClass += ' danger'
-    }
-    return (
-      <button className={buttonClass} disabled={disabled} onClick={this.handleClick}>
-        {label}
-      </button>
-    )
+  if (disabled) {
+    buttonClass.push('disabled')
   }
+  if (danger) {
+    buttonClass.push('danger')
+  }
+  const mergedClassName = buttonClass.join(' ')
 
+  return (
+    <button className={mergedClassName} disabled={disabled} onClick={handleClick}>{label}</button>
+  )
 }
