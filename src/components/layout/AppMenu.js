@@ -28,8 +28,12 @@ export default class AppMenu extends React.Component{
     this.calcMenuRoute()
   }
   
-  componentWillReceiveProps () {
-    this.calcMenuRoute()
+  componentWillReceiveProps (nextProps) {
+    if (!nextProps.collapsed) {
+      this.calcMenuRoute()
+      return
+    }
+    this.setState({ openKeys: [ ]})
   }
 
   calcMenuRoute () {

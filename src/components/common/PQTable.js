@@ -116,7 +116,9 @@ export default class PQTable extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.handleQueryChange()
+    if (this.props.query !== nextProps.query) {
+      this.handleQueryChange()
+    }
   }
 
   handleQueryChange () {
@@ -176,6 +178,7 @@ export default class PQTable extends React.Component {
   }
 
   resetReload () {
+    console.log(2)
     this.resetPagination()
     return this.loadData()
   }
